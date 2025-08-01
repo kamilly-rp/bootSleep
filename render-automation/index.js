@@ -4,12 +4,18 @@ const RENDER_API = "https://api.render.com/v1/services";
 const SERVICE_ID = process.env.SERVICE_ID;
 const API_KEY = process.env.API_KEY;
 
+if (!SERVICE_ID || !API_KEY) {
+  console.error("Erro: SERVICE_ID ou API_KEY não definidos nas variáveis de ambiente.");
+  process.exit(1);
+}
+
 const headers = {
   Authorization: `Bearer ${API_KEY}`,
 };
 
 async function suspendService() {
   try {
+    console.log("Suspending service...");
     await axios.post(`${RENDER_API}/${SERVICE_ID}/suspend`, {}, { headers });
     console.log("Serviço suspenso com sucesso às", new Date().toLocaleString());
   } catch (error) {
@@ -20,6 +26,7 @@ async function suspendService() {
 
 async function resumeService() {
   try {
+    console.log("Resuming service...");
     await axios.post(`${RENDER_API}/${SERVICE_ID}/resume`, {}, { headers });
     console.log("Serviço reativado com sucesso às", new Date().toLocaleString());
   } catch (error) {

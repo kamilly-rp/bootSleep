@@ -2,8 +2,8 @@ name: Render Automation
 
 on:
   schedule:
-    - cron: "0 3 * * *"   # 00:00 no Brasil (suspender)
-    - cron: "0 9 * * *"   # 06:00 no Brasil (reativar)
+    - cron: "0 3 * * *"   # 03:00 UTC (00:00 no Brasil - suspender)
+    - cron: "0 9 * * *"   # 09:00 UTC (06:00 no Brasil - reativar)
   workflow_dispatch:
 
 jobs:
@@ -24,17 +24,30 @@ jobs:
         working-directory: render-automation
 
       - name: Decide action
+        id: decide
         run: |
           hour=$(date -u +"%H")
-          if [[ "$hour" == "3" ]]; then
-            ACTION="suspend"
+          echo "Hora UTC: $hour"
+          if [[ "$hour" == "03" ]]; then
+            echo "::set-output name=action::suspend"
+          elif [[ "$hour" == "09" ]]; then
+            echo "::set-output name=action::resume"
           else
-            ACTION="resume"
+            echo "::set-output name=action::none"
           fi
-          echo "ACTION=$ACTION" >> $GITHUB_ENV
+
+      - name: Print env variables
+        if: steps.decide.outputs.action != 'none'
+        run: |
+          echo "SERVICE_ID: $SERVICE_ID"
+          echo "API_KEY: ***"
+        env:
+          SERVICE_ID: ${{ secrets.SERVICE_ID }}
+          API_KEY: ${{ secrets.API_KEY }}
 
       - name: Run automation script
-        run: node index.js $ACTION
+        if: steps.decide.outputs.action != 'none'
+        run: node index.js ${{ steps.decide.outputs.action }}
         working-directory: render-automation
         env:
           SERVICE_ID: ${{ secrets.SERVICE_ID }}
