@@ -2,13 +2,14 @@ name: Render Automation
 
 on:
   schedule:
-    - cron: "0 3 * * *"   # executa todo dia às 03:00 UTC (00:00 no Brasil se estiver -3)
-    - cron: "0 9 * * *"   # executa todo dia às 09:00 UTC (06:00 no Brasil)
-  workflow_dispatch: # permite rodar manualmente
+    - cron: "0 3 * * *"   # 00:00 no Brasil (suspender)
+    - cron: "0 9 * * *"   # 06:00 no Brasil (reativar)
+  workflow_dispatch:
 
 jobs:
   control-render:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -21,8 +22,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Decide action
+        run: |
+          hour=$(date -u +"%H")
+          if [[ "$hour" == "3" ]]; then
+            ACTION="suspend"
+          else
+            ACTION="resume"
+          fi
+          echo "ACTION=$ACTION" >> $GITHUB_ENV
+
       - name: Run automation script
-        run: node index.js
+        run: node index.js $ACTION
         env:
           SERVICE_ID: ${{ secrets.SERVICE_ID }}
           API_KEY: ${{ secrets.API_KEY }}
