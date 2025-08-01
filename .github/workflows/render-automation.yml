@@ -21,6 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: render-automation
 
       - name: Decide action
         run: |
@@ -34,6 +35,7 @@ jobs:
 
       - name: Run automation script
         run: node index.js $ACTION
+        working-directory: render-automation
         env:
           SERVICE_ID: ${{ secrets.SERVICE_ID }}
           API_KEY: ${{ secrets.API_KEY }}
