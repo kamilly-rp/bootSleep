@@ -29,21 +29,12 @@ jobs:
           hour=$(date -u +"%H")
           echo "Hora UTC: $hour"
           if [[ "$hour" == "03" ]]; then
-            echo "::set-output name=action::suspend"
+            echo "action=suspend" >> $GITHUB_OUTPUT
           elif [[ "$hour" == "09" ]]; then
-            echo "::set-output name=action::resume"
+            echo "action=resume" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=action::none"
+            echo "action=none" >> $GITHUB_OUTPUT
           fi
-
-      - name: Print env variables
-        if: steps.decide.outputs.action != 'none'
-        run: |
-          echo "SERVICE_ID: $SERVICE_ID"
-          echo "API_KEY: ***"
-        env:
-          SERVICE_ID: ${{ secrets.SERVICE_ID }}
-          API_KEY: ${{ secrets.API_KEY }}
 
       - name: Run automation script
         if: steps.decide.outputs.action != 'none'
