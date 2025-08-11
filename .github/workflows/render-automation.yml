@@ -9,6 +9,7 @@ on:
 jobs:
   control-render:
     runs-on: ubuntu-latest
+    environment: secrets-keys   # nome do Environment que contém os secrets
 
     steps:
       - name: Checkout repo
