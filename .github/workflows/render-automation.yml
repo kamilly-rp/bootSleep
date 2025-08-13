@@ -3,7 +3,7 @@ name: Render Automation
 on:
   schedule:
     - cron: "0 3 * * *"   # 03:00 UTC (00:00 no Brasil - suspender)
-    - cron: "0 9 * * *"   # 09:00 UTC (06:00 no Brasil - reativar)
+    - cron: "0 8 * * *"   # 08:00 UTC (05:00 no Brasil - reativar)
   workflow_dispatch:
 
 jobs:
