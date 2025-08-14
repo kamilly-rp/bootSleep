@@ -2,14 +2,14 @@ name: Render Automation
 
 on:
   schedule:
-    - cron: "0 3 * * *"   # 03:00 UTC (00:00 no Brasil - suspender)
-    - cron: "0 8 * * *"   # 08:00 UTC (05:00 no Brasil - reativar)
+    - cron: "0 3 * * *"    # Suspender às 00:00 Brasil (03:00 UTC)
+    - cron: "45 8 * * *"   # Reativar às 05:45 Brasil (08:45 UTC) para compensar atrasos
   workflow_dispatch:
 
 jobs:
   control-render:
     runs-on: ubuntu-latest
-    environment: secrets-keys   # nome do Environment que contém os secrets
+    environment: secrets-keys
 
     steps:
       - name: Checkout repo
@@ -27,11 +27,12 @@ jobs:
       - name: Decide action
         id: decide
         run: |
-          hour=$(date -u +"%H")
+          hour=$(date -u +"%H%M")
           echo "Hora UTC: $hour"
-          if [[ "$hour" == "03" ]]; then
+
+          if [[ "$hour" == "0300" ]]; then
             echo "action=suspend" >> $GITHUB_OUTPUT
-          elif [[ "$hour" == "09" ]]; then
+          elif [[ "$hour" -ge "0845" && "$hour" -lt "0915" ]]; then
             echo "action=resume" >> $GITHUB_OUTPUT
           else
             echo "action=none" >> $GITHUB_OUTPUT

@@ -13,11 +13,19 @@ const headers = {
   Authorization: `Bearer ${API_KEY}`,
 };
 
+// Função para mostrar horário no formato brasileiro
+function getHoraBrasil() {
+  const dataBrasil = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" })
+  );
+  return dataBrasil.toLocaleString("pt-BR", { hour12: false });
+}
+
 async function suspendService() {
   try {
     console.log("Suspending service...");
     await axios.post(`${RENDER_API}/${SERVICE_ID}/suspend`, {}, { headers });
-    console.log("Serviço suspenso com sucesso às", new Date().toLocaleString());
+    console.log(`Serviço suspenso com sucesso às ${getHoraBrasil()} (Horário de Brasília)`);
   } catch (error) {
     console.error("Erro ao suspender:", error.response?.data || error.message);
     process.exit(1);
@@ -28,7 +36,7 @@ async function resumeService() {
   try {
     console.log("Resuming service...");
     await axios.post(`${RENDER_API}/${SERVICE_ID}/resume`, {}, { headers });
-    console.log("Serviço reativado com sucesso às", new Date().toLocaleString());
+    console.log(`Serviço reativado com sucesso às ${getHoraBrasil()} (Horário de Brasília)`);
   } catch (error) {
     console.error("Erro ao reativar:", error.response?.data || error.message);
     process.exit(1);
